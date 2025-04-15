@@ -44,8 +44,8 @@ pip install -r requirements.txt
 
 Below is a list of experiments included in this repository:
 
-1. **RLC in time** - Analysis of a RLC circuit in the domain of time
-2. **RC in frequency** - Analysis of a RC circuit in the domain of frequency
+1. **RLC_time** - Analysis of a RLC circuit in the domain of time
+2. **RC_freq** - Analysis of a RC circuit in the domain of frequency
 
 Each experiment folder contains its own README with detailed information about the specific experiment, methodology, and results.
 
