@@ -28,17 +28,35 @@ physics-experiments/
 ### Prerequisites
 
 - Python 3.8 or higher
-- Required packages listed in `requirements.txt`
+- Conda package manager (recommended) or pip
 
 ### Installation
 
-Clone the repository and install required dependencies:
+#### Using Conda (Recommended)
+
+Clone the repository and create the conda environment:
+
+```bash
+git clone https://github.com/yourusername/physics-experiments.git
+cd physics-experiments
+conda env create -f environment.yml
+conda activate physics-experiments
+```
+
+#### Using Pip
+
+Alternatively, if you prefer using pip:
 
 ```bash
 git clone https://github.com/yourusername/physics-experiments.git
 cd physics-experiments
 pip install -r requirements.txt
 ```
+
+### Environment Files
+
+This repository includes both `environment.yml` (for conda users) and `requirements.txt` (for pip users) to make setup easier regardless of your preferred package manager.
+
 
 ## Experiments
 
