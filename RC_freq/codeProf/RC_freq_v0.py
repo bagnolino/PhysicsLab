@@ -17,14 +17,14 @@ params = {'legend.fontsize': '10',
           'legend.framealpha':    '0.8',      # legend patch transparency
           'legend.facecolor':     'w', # inherit from axes.facecolor; or color spec
           'legend.edgecolor':     'w',      # background patch boundary color
-          'figure.figsize': (6, 4),
+          'figure.figsize': (10, 6),
          'axes.labelsize': '10',
          'figure.titlesize' : '14',
          'axes.titlesize':'12',
          'xtick.labelsize':'10',
          'ytick.labelsize':'10',
          'lines.linewidth': '1',
-         'text.usetex': True,
+         'text.usetex': False, #True
 #         'axes.formatter.limits': '-5, -3',
          'axes.formatter.min_exponent': '2',
 #         'axes.prop_cycle': cycler('color', 'bgrcmyk')
@@ -53,14 +53,13 @@ def fit_nlin_phi(x, ft):
     return fitval
 
 # Input file name
-file = 'RC_freq/codeProf/RCF_PB'
-inputname = file+'.txt'
-# Output file name
+file = 'RC_freq'
+inputname = file+'.csv'
 
 # Initial parameter values
-ft_init= 1400. # Hz 
+ft_init= 5300 #1400. # Hz 
 
-# Assumed reading errors
+# Assumed reading errors, errori di lettura (?)
 y_errfix = 0.1
 y_errper = 0.02
 
@@ -74,13 +73,13 @@ the slope is the resistance of the resistor
 """
 
 # load from file
-data = np.loadtxt(inputname).T
-f = np.array(data[0] # Hz
+data = np.genfromtxt(f'RC_freq/input/{inputname}', delimiter=';', skip_header=1)
+f=(np.array(data[0]))                                # f = 1/(np.array(data[0])*1e-6) # Hz
 Vin = np.array(data[1]) # V
 Vout = np.array(data[2]) # V
 A = Vout/Vin
 V_fs = np.array(data[3]) # V
-phi = 2*np.pi*f*np.array(data[4])*1e-6/(np.pi/2.) # norm to 1
+phi = 2*np.pi*f*np.array(data[4])*1e-6/(np.pi/2.) # norm to 1 : NORMALIZZA
 phi_fs = 2*np.pi*f*np.array(data[5])*1e-6/(np.pi/2.)
 
 
@@ -92,7 +91,7 @@ Vin_errL = V_fs[0]/10*0.41
 V_errL = V_fs/10*0.41
 phi_errL = phi_fs/10*0.41*np.sqrt(2)
 A_err = A*np.sqrt((V_errL/Vout)**2+(Vin_errL/Vin)**2 + 2*(0.03*0.41)**2)
-A_err[(f>900) & (f<2000)] = A[(f>900) & (f<2000)]*np.sqrt((V_errL[(f>900) & (f<2000)]/Vout[(f>900) & (f<2000)])**2+(Vin_errL/Vin[(f>900) & (f<1700)])**2)
+#A_err[(f>3000) & (f<9000)] = A[(f>3000) & (f<9000)]*np.sqrt((V_errL[(f>3000) & (f<9000)]/Vout[(f>3000) & (f<9000)])**2+(Vin_errL/Vin[(f>3000) & (f<9000)])**2) # A_err[(f>900) & (f<2000)] = A[(f>900) & (f<2000)]*np.sqrt((V_errL[(f>900) & (f<2000)]/Vout[(f>900) & (f<2000)])**2+(Vin_errL/Vin[(f>900) & (f<1700)])**2)
 #A_err = []
 #for i in range(len(V_errL)):
 #    if V_errL[i] == Vin_errL :
@@ -108,7 +107,7 @@ print(Vin_errL,V_errL, A_err)
 # Fit lineare locale
 #---------------------------
 
-scan = 300. # +/- intervallo linearita' di rispetto ft_init
+scan = 2222. # +/- intervallo linearita' di rispetto ft_init :: LINEA 94 e 110 da vedere
 f_min = ft_init-scan
 f_max = ft_init+scan
 print(f_min,f_max)
@@ -182,7 +181,7 @@ x_fit = np.linspace(f_min, f_max, 1000)
 # Plot data, fit and residuals
 """
 
-fig, ax = plt.subplots(2, 1, figsize=(5, 4),sharex=True, constrained_layout = True, height_ratios=[2, 1])
+fig, ax = plt.subplots(2, 1, figsize=(7.5, 6),sharex=True, constrained_layout = True, height_ratios=[2, 1])
 ax[0].plot(x_fit, fit_lin(x_fit, *popt_A), label='modulo', linestyle='--', color='black')
 ax[0].plot(x_fit,fit_lin(x_fit,*popt_phi), label='fase', linestyle='dashed', color='green')
 ax[0].errorbar(f,A,yerr=A_err, fmt='o',ms=2,color='black') # , label=r'data'
@@ -192,13 +191,13 @@ ax[0].set_ylim(0,1)
 ax[0].legend(loc='upper right')
 ax[0].set_ylabel(r'$\left|A\right|$ / $\phi_{norm \to 1}$')
 #ax[0].set_xticks([2,3,4,5])
-ax[0].text(1500,0.4,r'm = {a:.3e} $\pm$ {b:.1e} $s$'.format(a=popt_A[0], b=perr_A[0]), size=8, color='black')
-ax[0].text(1500,0.3,r'q = {c:.3f} $\pm$ {d:.3f}'.format(c=popt_A[1],d=perr_A[1]), size=8, color='black')
-ax[0].text(1500,0.2,r'm = {a:.3e} $\pm$ {b:.1e} $s$'.format(a=popt_phi[0], b=perr_phi[0]), size=8, color='green')
-ax[0].text(1500,0.1,r'q = {c:.3f} $\pm$ {d:.3f}'.format(c=popt_phi[1],d=perr_phi[1]), size=8, color='green')
+ax[0].text(7000,0.4,r'm = {a:.3e} $\pm$ {b:.1e} $s$'.format(a=popt_A[0], b=perr_A[0]), size=9, color='black')
+ax[0].text(7000,0.3,r'q = {c:.3f} $\pm$ {d:.3f}'.format(c=popt_A[1],d=perr_A[1]), size=9,color='black')
+ax[0].text(7000,0.2,r'm = {a:.3e} $\pm$ {b:.1e} $s$'.format(a=popt_phi[0], b=perr_phi[0]), size=9, color='green')
+ax[0].text(7000,0.1,r'q = {c:.3f} $\pm$ {d:.3f}'.format(c=popt_phi[1],d=perr_phi[1]), size=9, color='green')
 
-ax[0].text(1100,0.15,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_phi, d=err_ft_phi), size=10, color='green')
-ax[0].text(1100,0.25,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_A, d=err_ft_A), size=10, color='black')
+ax[0].text(4000,0.2,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_phi, d=err_ft_phi), size=11, color='green')
+ax[0].text(4000,0.3,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_A, d=err_ft_A), size=11, color='black')
 
 ax[1].errorbar(x,residuA,yerr=y_err_A, fmt='o', label=r'modulo',ms=2,color='black')
 ax[1].errorbar(x,residuphi,yerr=z_err_phi, fmt='o', label=r'fase ',ms=2,color='green')
@@ -215,7 +214,7 @@ plt.savefig(file+'_loc.png',
             facecolor ="w",
             edgecolor ='w',
             orientation ='Portrait',
-            dpi = 'figure')
+            dpi = 500)
 
 plt.show()
 
@@ -228,7 +227,7 @@ ft = ft_phi
 
 scan = 5000. # +/- intervallo linearita' di rispetto ft_init
 f_min = (ft+scan)
-f_max = (ft+55*scan)
+f_max = (ft+55*scan) #DA RIVEDERE
 print(ft,f_min,f_max)
 
 x = np.log10(f[(f>f_min) & (f<f_max)]/ft)
@@ -292,7 +291,7 @@ x_fit = np.linspace(np.log10(f_min/ft), np.log10(f_max/ft), 1000)
 # Plot data, fit and residuals
 """
 
-fig, ax = plt.subplots(2, 1, figsize=(5, 4),sharex=True, constrained_layout = True, height_ratios=[2, 1])
+fig, ax = plt.subplots(2, 1, figsize=(7.5, 6),sharex=True, constrained_layout = True, height_ratios=[2, 1])
 ax[0].plot(x_fit, fit_lin(x_fit, *popt_logA), label='BODE 1', linestyle='--', color='green')
 ax[0].plot(x_fit, custom_fit_lin(x_fit, *popt_logA2), label='BODE 2', linestyle='--', color='blue')
 ax[0].errorbar(np.log10(f/ft), 20*np.log10(A),yerr=20*1/A*A_err, fmt='o',ms=1,color='black') # , label=r'data'
@@ -304,8 +303,8 @@ ax[0].set_ylabel(r'$\left|A\right|~(dB)$')
 #ax[0].text(1.0,-10,r'm = {a:.3e} $\pm$ {b:.1e}'.format(a=popt_logA[0], b=perr_logA[0]), size=8, color='green')
 #ax[0].text(1.0,-15,r'q = {c:.3f} $\pm$ {d:.3f}'.format(c=popt_logA[1],d=perr_logA[1]), size=8, color='green')
 
-ax[0].text(-1,-30,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_bode1, d=err_ft_bode1), size=10, color='green')
-ax[0].text(-1,-35,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_bode2, d=err_ft_bode2), size=10, color='blue')
+ax[0].text(-0.5,-30,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_bode1, d=err_ft_bode1), size=12, color='green')
+ax[0].text(-0.5,-35,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_bode2, d=err_ft_bode2), size=12, color='blue')
 
 ax[1].errorbar(x,residulogA,yerr=y_err_logA, fmt='o',ms=2,color='black')
 ax[1].plot(x_fit, custom_fit_lin(x_fit, *popt_logA2)-fit_lin(x_fit, *popt_logA), linestyle='--', color='blue')
@@ -322,7 +321,7 @@ plt.savefig(file+'_BODE.png',
             facecolor ="w",
             edgecolor ='w',
             orientation ='Portrait',
-            dpi = 'figure')
+            dpi = 500)
 
 plt.show()
 
@@ -338,8 +337,8 @@ y = A
 z = phi
 y_err_A = A_err
 
-scan = 300. # +/- intervallo preso con stessa sonda Vout e Vin
-f_min = ft_init-scan
+scan = 5000. # +/- intervallo preso con stessa sonda Vout e Vin
+f_min = ft_init-scan #va bene ft?
 f_max = ft_init+scan
 y_err_A[(f>f_min) & (f<f_max)] = A_err[(f>f_min) & (f<f_max)]
 z_err_phi = phi_errL
@@ -393,12 +392,12 @@ print("=============================================================\n")
 
 # fit tracciato con mille punti fra la freq min e max
 x_fit = np.linspace(np.min(x), np.max(x), 1000)
-
+                    
 """
 # Plot data, fit and residuals
 """
 
-fig, ax = plt.subplots(2, 1, figsize=(5, 4),sharex=True, constrained_layout = True, height_ratios=[2, 1])
+fig, ax = plt.subplots(2, 1, figsize=(7.5, 6),sharex=True, constrained_layout = True, height_ratios=[2, 1])
 ax[0].plot(x_fit, fit_nlin_A(x_fit, *popt_nl_A), label='modulo', linestyle='--', color='blue')
 ax[0].plot(x_fit,fit_nlin_phi(x_fit,*popt_nl_phi), label='fase', linestyle='--', color='green')
 ax[0].errorbar(f,A,yerr=A_err, fmt='o',ms=2,color='blue') # , label=r'data'
@@ -410,8 +409,8 @@ ax[0].legend(loc='upper right')
 ax[0].set_ylabel(r'$\left|A\right|$ / $\phi_{norm \to 1}$')
 #ax[0].set_xticks([2,3,4,5])
 
-ax[0].text(10000,0.5,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_nl_phi, d=err_ft_phi), size=10, color='green')
-ax[0].text(10000,0.6,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_nl_A, d=err_ft_A), size=10, color='blue')
+ax[0].text(225,0.7,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_nl_phi, d=err_ft_phi), size=12, color='green')
+ax[0].text(225,0.8,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_nl_A, d=err_ft_A), size=12, color='blue')
 
 ax[1].errorbar(x,residu_nl_A,yerr=y_err_A, fmt='o', label=r'modulo',ms=2,color='blue')
 ax[1].errorbar(x,residu_nl_phi,yerr=z_err_phi, fmt='o', label=r'fase ',ms=2,color='green')
@@ -429,7 +428,7 @@ plt.savefig(file+'_NL.png',
             facecolor ="w",
             edgecolor ='w',
             orientation ='Portrait',
-            dpi = 'figure')
+            dpi = 500)
 
 plt.show()
 
@@ -518,7 +517,7 @@ x_fit2 = np.linspace(np.min(x2), np.max(x2), 1000)
 # Plot data, fit and residuals
 """
 
-fig, ax = plt.subplots(2, 2, figsize=(7, 4),sharex='col', constrained_layout = True, height_ratios=[2, 1])
+fig, ax = plt.subplots(2, 2, figsize=(10, 6),sharex='col', constrained_layout = True, height_ratios=[2, 1])
 ax[0,0].plot(x_fit2, custom_fit_lin1(x_fit2, *popt_lin_A), label='modulo', linestyle='--', color='blue')
 ax[0,1].plot(x_fit,custom_fit_lin2(x_fit,*popt_lin_phi), label='fase', linestyle='--', color='green')
 ax[0,0].errorbar(x2,y,yerr=y_err_A2, fmt='o',ms=2,color='blue') # , label=r'data'
@@ -531,8 +530,8 @@ ax[0,0].legend(loc='upper right')
 ax[0,0].set_ylabel(r'$\left|A\right|$ / $\phi_{norm \to 1}$')
 #ax[0].set_xticks([2,3,4,5])
 
-ax[0,1].text(500,20,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_lin_phi, d=err_ft_phi), size=10, color='green')
-ax[0,0].text(30000,5,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_lin_A, d=err_ft_A), size=10, color='blue')
+ax[0,1].text(5000,7,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_lin_phi, d=err_ft_phi), size=12.5, color='green')
+ax[0,0].text(20000,1.9,r'$f_t$ = {e:.0f} +/- {d:.0f} Hz'.format(e=ft_lin_A, d=err_ft_A), size=12.5, color='blue')
 
 ax[1,0].errorbar(x2,residu_lin_A,yerr=y_err_A2, fmt='o', label=r'modulo',ms=2,color='blue')
 ax[1,1].errorbar(x,residu_lin_phi,yerr=z_err_phi, fmt='o', label=r'fase ',ms=2,color='green')
@@ -551,7 +550,7 @@ plt.savefig(file+'_lin.png',
             facecolor ="w",
             edgecolor ='w',
             orientation ='Portrait',
-            dpi = 'figure')
+            dpi = 500)
 
 plt.show()
 
@@ -564,7 +563,7 @@ ft_stima = [list(row) for row in zip(*ft_stima)]
 ft_stima[1] = np.asarray(ft_stima[1])*1e-3
 ft_stima[2] = np.asarray(ft_stima[2])*1e-3
 
-fig, ax = plt.subplots(2, 1, figsize=(5, 4),sharex=True, constrained_layout = True, height_ratios=[1, 1])
+fig, ax = plt.subplots(2, 1, figsize=(7.5, 6),sharex=True, constrained_layout = True, height_ratios=[1, 1])
 
 ax[0].errorbar(ft_stima[0], ft_stima[1], yerr=ft_stima[2], fmt='o',ms=2)
 
@@ -573,7 +572,7 @@ err_res_media = 1/np.sqrt(1/ft_stima[2][0]**2+1/ft_stima[2][1]**2+1/ft_stima[2][
 ax[0].plot(ft_stima[0],[res_media]*len(ft_stima[0]),linestyle = '--', color = 'red')
 res_ylim = np.std(ft_stima[1])*5
 ax[0].set_ylim([res_media-1*res_ylim,res_media+res_ylim])
-ax[0].text(ft_stima[0][0],res_media+0.025,r'$f_t$ = {e:.3f} +/- {d:.3f} kHz'.format(e=res_media, d=err_res_media), size=10, color='red')
+ax[0].text(ft_stima[0][0],res_media+0.025,r'$f_t$ = {e:.3f} +/- {d:.3f} kHz'.format(e=res_media, d=err_res_media), size=12, color='red')
 
 
 
@@ -587,7 +586,7 @@ err_C__media_nl =  1/np.sqrt(1/err_C_[3]**2+1/err_C_[4]**2) # = np.sqrt(1/np.sum
 print(C__media_nl,err_C__media_nl)
 
 ax[1].plot(ft_stima[0],[C__media]*len(ft_stima[0]),linestyle = '--', color = 'red')
-ax[1].text(ft_stima[0][1],C__media-5,r'C = {e:.1f} +/- {d:.1f} nF'.format(e=C__media, d=err_C__media), size=10, color='red')
+ax[1].text(ft_stima[0][1],C__media-5,r'C = {e:.1f} +/- {d:.1f} nF'.format(e=C__media, d=err_C__media), size=12, color='red')
 
 ax[1].errorbar(ft_stima[0], C_, yerr=err_C_, fmt='o',ms=2)
 C__ylim = np.std(C_)*10
@@ -620,7 +619,7 @@ plt.savefig(file+'_res.png',
             facecolor ="w",
             edgecolor ='w',
             orientation ='Portrait',
-            dpi = 'figure')
+            dpi = 500)
 
 plt.show()
 
